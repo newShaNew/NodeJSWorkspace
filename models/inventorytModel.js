@@ -9,9 +9,9 @@ const pool = require('./db');
  */
 const getInventoryByCondition = async (openId, optionalParams = {}) => {
   // 1. 基础SQL（必带openId条件，因为openId必填）
-  let sql = 'SELECT * FROM inventory_table WHERE openId = ?';
+  let sql = 'SELECT * FROM inventory_table WHERE openId in (select openId from home_group_table where id = (select id from home_group_table where openId = ?) union all select ?)';
   // 2. 存储所有查询参数（先放入必填的openId）
-  const queryParams = [openId];
+  const queryParams = [openId,openId];
 
   // 3. 解构可选参数（根据你的业务需求扩展，如price、description等）
   const { id, inventoryName, date, position, category, isDelete, showIndex, sort, order } = optionalParams;
@@ -192,9 +192,11 @@ const updateInventory = async (id, updateData) => {
   }
 
   // 拼接完整SQL，最后添加WHERE条件（库存ID）
-  const sql = `UPDATE inventory_table SET ${updateFields.join(', ')} WHERE id = ? AND openId = ?`;
+  const sql = `UPDATE inventory_table SET ${updateFields.join(', ')} WHERE id = ? AND 
+  openId in (select openId from home_group_table where id = (select id from home_group_table where openId = ?) union all select ?)`;
   updateParams.push(id); // 把库存ID加入参数列表（对应WHERE后的?）
-  updateParams.push(openId); // 把库存ID加入参数列表（对应WHERE后的?）
+  updateParams.push(openId);
+  updateParams.push(openId);
 
   const [result] = await pool.query(sql, updateParams);
   if (result.affectedRows === 0) {

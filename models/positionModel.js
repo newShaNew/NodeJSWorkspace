@@ -9,9 +9,9 @@ const pool = require('./db');
  */
 const getPositionByCondition = async (openId, optionalParams = {}) => {
   // 1. 基础SQL（必带openId条件，因为openId必填）
-  let sql = 'SELECT * FROM position_table WHERE openId = ? ORDER BY position';
+  let sql = 'SELECT * FROM position_table WHERE openId in (select openId from home_group_table where id = (select id from home_group_table where openId = ?) union all select ?) ORDER BY position';
   // 2. 存储所有查询参数（先放入必填的openId）
-  const queryParams = [openId];
+  const queryParams = [openId,openId];
 
   // 5. 执行参数化查询（无论条件多少，都用占位符，防SQL注入）
   const [rows] = await pool.query(sql, queryParams);
@@ -70,10 +70,12 @@ const updatePosition = async (id, updateData) => {
     throw new Error('该库存不存在或已被删除，无法更新');
   }
 
-  const sql = `UPDATE position_table SET position = ? WHERE id = ? AND openId = ?`;
+  const sql = `UPDATE position_table SET position = ? WHERE id = ? AND
+   openId in (select openId from home_group_table where id = (select id from home_group_table where openId = ?) union all select ?)`;
   const updateParams = [];
   updateParams.push(position);
   updateParams.push(id);
+  updateParams.push(openId);
   updateParams.push(openId);
 
   const [result] = await pool.query(sql, updateParams);
@@ -109,8 +111,8 @@ const deletePosition = async (id, deleteData) => {
     throw new Error('该库存不存在或已被删除，无需重复删除');
   }
 
-  const sql = 'DELETE FROM position_table WHERE id = ? and openId = ?';
-  const [result] = await pool.query(sql, [id, openId]);
+  const sql = 'DELETE FROM position_table WHERE id = ? and openId in (select openId from home_group_table where id = (select id from home_group_table where openId = ?) union all select ?)';
+  const [result] = await pool.query(sql, [id, openId,openId]);
 
   if (result.affectedRows === 0) {
     throw new Error('删除库存失败，请稍后重试');

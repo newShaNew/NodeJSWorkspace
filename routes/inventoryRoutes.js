@@ -10,6 +10,38 @@ const { successResponse, errorResponse } = require('../utils/responseUtil');
  * 查（多个）：多条件可选查询（仅openId必填，其他参数可为空）
  * POST /api/inventory/queryByParams
  */
+router.post('/queryQcCode', async (req, res) => {
+  try {
+    const APPID = "wx5ea8e6f0e044efcd";
+    // 步骤2：后端调用微信官方jscode2session接口
+    const wxApiUrl = `https://api.weixin.qq.com/sns/jscode2session?appid=${APPID}&secret=${APPSECRET}&js_code=${code}&grant_type=authorization_code`;
+    const wxRes = await axios.get(wxApiUrl);
+    const wxData = wxRes.data;
+
+    // 步骤3：判断微信接口返回结果
+    if (wxData.errcode) {
+      return res.json({
+        code: 500,
+        message: `换取openId失败：${wxData.errmsg}`,
+        data: null
+      });
+    }
+
+    // 步骤4：提取openId（可按需存储到数据库，再返回给前端）
+    const { openid, session_key } = wxData;
+
+    // 3. 统一成功响应
+    return successResponse(res, inventoryList, `查询成功，共找到${inventoryList.length}条数据`);
+  } catch (error) {
+    console.log(error)
+    return errorResponse(res, error.message, 400, error.message);
+  }
+});
+
+/**
+ * 查（多个）：多条件可选查询（仅openId必填，其他参数可为空）
+ * POST /api/inventory/queryByParams
+ */
 router.post('/queryByParams', async (req, res) => {
   try {
     // 1. 提取请求体参数，openId单独提取（必填），其余为可选参数
