@@ -8,7 +8,9 @@ const dbConfig = {
   port: 3306, // 百度智能云MySQL端口（默认3306，修改过则填实际端口）
   user: 'root', // 控制台账号管理中的完整账号cd
   password: 'suzhisanlian1.', // 控制台重置后的密码
-  database: 'sys' // 已创建的数据库（可选，可在查询时指定）
+  database: 'sys', // 已创建的数据库（可选，可在查询时指定）
+  timezone: '+08:00', // 东八区，和Node.js时区一致
+  dateStrings: true,  // ② 关键！查询时返回字符串而非Date对象，避免时区解析错误
 };
 
 // 本地测试链接服务器数据库
@@ -17,7 +19,9 @@ const dbConfig = {
 //   port: 3306, // 百度智能云MySQL端口（默认3306，修改过则填实际端口）
 //   user: 'root', // 控制台账号管理中的完整账号cd
 //   password: 'suzhisanlian1.', // 控制台重置后的密码
-//   database: 'sys' // 已创建的数据库（可选，可在查询时指定）
+//   database: 'test', // 已创建的数据库（可选，可在查询时指定）
+//   timezone: '+08:00', // 东八区，和Node.js时区一致
+//   dateStrings: true,  // ② 关键！查询时返回字符串而非Date对象，避免时区解析错误
 // };
 
 

@@ -11,10 +11,10 @@ const getInventoryByCondition = async (openId, optionalParams = {}) => {
   // 1. 基础SQL（必带openId条件，因为openId必填）
   let sql = 'SELECT * FROM inventory_table WHERE openId in (select openId from home_group_table where id = (select id from home_group_table where openId = ?) union all select ?)';
   // 2. 存储所有查询参数（先放入必填的openId）
-  const queryParams = [openId,openId];
+  const queryParams = [openId, openId];
 
   // 3. 解构可选参数（根据你的业务需求扩展，如price、description等）
-  const { id, inventoryName, date, position, category, isDelete, showIndex, sort, order } = optionalParams;
+  const { id, inventoryName, date, position, category, isDelete, showIndex, sort, order, range } = optionalParams;
 
   if (id && !id.trim() !== '') {
     sql += ' AND id = ?';
@@ -26,7 +26,7 @@ const getInventoryByCondition = async (openId, optionalParams = {}) => {
     queryParams.push(inventoryName.trim());
   }
 
-  if (date && !id.trim() !== '') {
+  if (date) {
     if (date == '0') {
       sql += ' AND date < NOW()';
     } else {
@@ -58,7 +58,7 @@ const getInventoryByCondition = async (openId, optionalParams = {}) => {
   }
 
   if (position && Array.isArray(position) && position.length > 0) {
-    const validPosition = category.filter(item => item && item.trim() !== '');
+    const validPosition = position.filter(item => item && item.trim() !== '');
     if (validPosition.length > 0) {
       const placeholders = validPosition.map(() => '?').join(', ');
       sql += ` AND position IN (${placeholders})`;
@@ -68,6 +68,10 @@ const getInventoryByCondition = async (openId, optionalParams = {}) => {
 
   if (sort && !sort.trim() !== '') {
     sql += ' ORDER BY ' + sort + ' ' + order;
+  }
+
+  if (range && !range.trim() !== '') {
+    sql += ' LIMIET (0,' + range + ') ';
   }
 
   // 5. 执行参数化查询（无论条件多少，都用占位符，防SQL注入）
@@ -216,5 +220,4 @@ module.exports = {
   getInventoryByCondition,
   addInventory,
   updateInventory
-
 };

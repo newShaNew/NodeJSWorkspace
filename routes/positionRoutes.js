@@ -1,7 +1,7 @@
 // 引入Express路由
 const express = require('express');
 const router = express.Router();
-// 引入库存业务层
+// 引入位置信息业务层
 const positionService = require('../services/positionService');
 // 引入统一响应工具
 const { successResponse, errorResponse } = require('../utils/responseUtil');
@@ -27,14 +27,14 @@ router.post('/queryByParams', async (req, res) => {
 });
 
 /**
- * 3. 增：新增库存
+ * 3. 增：新增位置信息
  * POST /api/position/add
  */
 router.post('/add', async (req, res) => {
   try {
     const positionData = req.body;
     const result = await positionService.addPosition(positionData);
-    return successResponse(res, result, '新增库存成功', 201); // 201表示创建成功
+    return successResponse(res, result, '新增位置信息成功', 201); // 201表示创建成功
   } catch (error) {
     console.log(error)
     return errorResponse(res, error.message, 400, error.message);
@@ -42,7 +42,7 @@ router.post('/add', async (req, res) => {
 });
 
 /**
- * 4. 改：更新库存
+ * 4. 改：更新位置信息
  * PUT /api/position/update/:id
  */
 router.put('/update/:id', async (req, res) => {
@@ -50,7 +50,7 @@ router.put('/update/:id', async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
     const result = await positionService.updatePosition(id, updateData);
-    return successResponse(res, result, '更新库存成功');
+    return successResponse(res, result, '更新位置信息成功');
   } catch (error) {
     console.log(error)
     return errorResponse(res, error.message, 400, error.message);
@@ -58,7 +58,7 @@ router.put('/update/:id', async (req, res) => {
 });
 
 /**
- * 5. 删：删除库存
+ * 5. 删：删除位置信息
  * DELETE /api/position/delete/:id
  */
 router.delete('/delete/:id', async (req, res) => {
@@ -66,7 +66,7 @@ router.delete('/delete/:id', async (req, res) => {
     const { id } = req.params;
     const deleteData = req.body;
     const result = await positionService.deletePosition(id, deleteData);
-    return successResponse(res, result, '删除库存成功');
+    return successResponse(res, result, '删除位置信息成功');
   } catch (error) {
     console.log(error)
     return errorResponse(res, error.message, 400, error.message);

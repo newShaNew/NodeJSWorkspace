@@ -34,9 +34,10 @@ const getOpenId = async (code) => {
   const { openid, session_key } = wxData;
 
   // 查询是否为第一次登入
-  const processedList = await userModel.getUserByCondition(openId);
+  const processedList = await userModel.getUserByCondition(openid);
 
   // 是的话user表添加数据
+  var userData = { openId: userData }
   if (!processedList) userModel.addUser(userData);
   // return res.json({
   //   code: 200,
@@ -89,8 +90,8 @@ const addUser = async (userData) => {
  * @param {Object} updateData - 要更新的用户数据（可选字段）
  * @returns {Promise<Object>} 更新结果
  */
-const updateUser = async (id, updateData) => {
-  return await userModel.updateUser(id, updateData);
+const updateUser = async (updateData) => {
+  return await userModel.updateUser(updateData);
 
 };
 

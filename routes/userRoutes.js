@@ -14,7 +14,7 @@ const { successResponse, errorResponse } = require('../utils/responseUtil');
 router.post('/getOpenId', async (req, res) => {
   try {
     // 1. 提取请求体参数，openId单独提取（必填），其余为可选参数
-    const { code } = req.query;
+    const { code } = req.body;
     if (!code) {
       return res.json({
         code: 400,
@@ -73,7 +73,7 @@ router.post('/add', async (req, res) => {
  * 4. 改：更新用户
  * PUT /api/user/update
  */
-router.put('/update', async (req, res) => {
+router.post('/update', async (req, res) => {
   try {
     const updateData = req.body;
     const result = await userService.updateUser(updateData);
